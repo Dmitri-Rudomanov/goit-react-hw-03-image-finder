@@ -1,22 +1,46 @@
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import s from './SearchForm.module.css';
 
-const SearchForm = ({ onSubmit }) => {
-  return (
-    <form className={s.SearchForm}>
-      <button type="submit" className={s.SearchFormButton}>
-        <span className={s.SearchFormButtonLabel}>Search</span>
-      </button>
+class SearchForm extends Component {
+  state = {
+    query: '',
+  };
 
-      <input
-        className={s.SearchFormInput}
-        type="text"
-        autoComplete="off"
-        autoFocus
-        placeholder="Search images and photos"
-      />
-    </form>
-  );
-};
+  handleQueryChange = event => {
+    this.setState({ query: event.currentTarget.value });
+  };
+
+  handleSubmit = event => {
+    event.preventDefault();
+
+    if (this.state.query.trim() === '') {
+      return;
+    }
+
+    this.props.onSubmit(this.state.query);
+    this.setState({ query: '' });
+  };
+
+  render() {
+    return (
+      <form className={s.SearchForm} onSubmit={this.handleSubmit}>
+        <button type="submit" className={s.SearchFormButton}>
+          <span className={s.SearchFormButtonLabel}>Search</span>
+        </button>
+
+        <input
+          className={s.SearchFormInput}
+          type="text"
+          autoComplete="off"
+          value={this.state.query}
+          autoFocus
+          placeholder="Search images and photos"
+          onChange={this.handleQueryChange}
+        />
+      </form>
+    );
+  }
+}
 
 export default SearchForm;
