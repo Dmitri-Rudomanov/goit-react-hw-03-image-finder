@@ -4,6 +4,8 @@ import ImageGallery from './ImageGallery/ImageGallery.js';
 import pixabayAPI from '../services/pixabayApi.js';
 import Button from './Button/Button.js';
 import Loader from './Loader/Loader.js';
+import Modal from './Modal/Modal.js';
+import s from './App.module.css';
 
 class App extends Component {
   state = {
@@ -11,6 +13,8 @@ class App extends Component {
     query: '',
     page: 1,
     isLoading: null,
+    showModal: null,
+    largeImg: '',
   };
 
   onBtnClick = () => {
@@ -25,6 +29,19 @@ class App extends Component {
       this.onFetchImg();
     }
   }
+
+  handleGalleryImg = fullImgUrl => {
+    this.setState({
+      largeImg: fullImgUrl,
+      showModal: true,
+    });
+  };
+
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({
+      showModal: !showModal,
+    }));
+  };
 
   queryChange = query => {
     this.setState({ query });
@@ -48,9 +65,15 @@ class App extends Component {
       this.state.images.length !== 0 && !this.state.isLoading;
 
     return (
-      <div>
+      <div className={s.App}>
+        {this.state.showModal && (
+          <Modal largeImage={this.state.largeImg} onClose={this.toggleModal} />
+        )}
         <Searchbar onSubmit={this.queryChange} />
-        <ImageGallery Images={this.state.images} />
+        <ImageGallery
+          Images={this.state.images}
+          onImgClick={this.handleGalleryImg}
+        />
         {this.state.isLoading && <Loader />}
         {showMoreCheck && <Button onClick={this.onBtnClick} />}
       </div>
