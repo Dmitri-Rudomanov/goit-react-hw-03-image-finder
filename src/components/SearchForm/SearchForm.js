@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import s from './SearchForm.module.css';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 class SearchForm extends Component {
   state = {
@@ -14,6 +16,7 @@ class SearchForm extends Component {
     event.preventDefault();
 
     if (this.state.query.trim() === '') {
+      toast.error('Please enter your search query.');
       return;
     }
 

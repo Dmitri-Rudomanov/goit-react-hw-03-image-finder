@@ -8,8 +8,6 @@ function fetchGallery(name, page) {
     if (response.ok) {
       return response.json();
     }
-
-    //return Promise.reject(new Error(`Нет покемона с именем ${name}`));
   });
 }
 

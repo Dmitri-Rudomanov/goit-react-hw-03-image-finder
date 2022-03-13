@@ -5,7 +5,9 @@ import pixabayAPI from '../services/pixabayApi.js';
 import Button from './Button/Button.js';
 import Loader from './Loader/Loader.js';
 import Modal from './Modal/Modal.js';
+import Error from './Error/Error.js';
 import s from './App.module.css';
+import { ToastContainer } from 'react-toastify';
 
 class App extends Component {
   state = {
@@ -15,6 +17,7 @@ class App extends Component {
     isLoading: null,
     showModal: null,
     largeImg: '',
+    error: null,
   };
 
   onBtnClick = () => {
@@ -52,30 +55,41 @@ class App extends Component {
     this.setState({ isLoading: true });
     pixabayAPI
       .fetchGallery(this.state.query, this.state.page)
-      .then(({ hits }) =>
+      .then(({ hits }) => {
         this.setState(prevState => ({
           images: [...prevState.images, ...hits],
           isLoading: false,
-        }))
-      );
+        }));
+        if (this.state.images.length === 0) {
+          this.setState({ error: 'true' });
+        }
+      });
   };
 
   render() {
-    const showMoreCheck =
-      this.state.images.length !== 0 && !this.state.isLoading;
+    const { showModal, isLoading, largeImg, images, error, query } = this.state;
+    const showMoreCheck = images.length !== 0 && !isLoading;
 
     return (
-      <div className={s.App}>
-        {this.state.showModal && (
-          <Modal largeImage={this.state.largeImg} onClose={this.toggleModal} />
-        )}
+      <div>
         <Searchbar onSubmit={this.queryChange} />
-        <ImageGallery
-          Images={this.state.images}
-          onImgClick={this.handleGalleryImg}
-        />
-        {this.state.isLoading && <Loader />}
-        {showMoreCheck && <Button onClick={this.onBtnClick} />}
+        <div className={s.App}>
+          {showModal && (
+            <Modal largeImage={largeImg} onClose={this.toggleModal} />
+          )}
+          <ImageGallery
+            Images={this.state.images}
+            onImgClick={this.handleGalleryImg}
+          />
+          {this.state.isLoading && <Loader />}
+          {showMoreCheck && <Button onClick={this.onBtnClick} />}
+          {error && (
+            <Error
+              message={`Sorry, There is no picture matching search query: ${query}`}
+            />
+          )}
+        </div>
+        <ToastContainer autoClose={2000} />
       </div>
     );
   }
