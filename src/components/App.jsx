@@ -8,6 +8,7 @@ import Modal from './Modal/Modal.js';
 import Error from './Error/Error.js';
 import s from './App.module.css';
 import { ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 class App extends Component {
   state = {
@@ -18,6 +19,7 @@ class App extends Component {
     showModal: null,
     largeImg: '',
     error: null,
+    showMore: true,
   };
 
   onBtnClick = () => {
@@ -55,7 +57,7 @@ class App extends Component {
     this.setState({ isLoading: true });
     pixabayAPI
       .fetchGallery(this.state.query, this.state.page)
-      .then(({ hits }) => {
+      .then(({ hits, totalHits }) => {
         this.setState(prevState => ({
           images: [...prevState.images, ...hits],
           isLoading: false,
@@ -63,12 +65,17 @@ class App extends Component {
         if (this.state.images.length === 0) {
           this.setState({ error: 'true' });
         }
+        if (this.state.images.length >= totalHits) {
+          toast.warning('Sorry,you`ve reach the end of search result');
+          this.setState({ showMore: false });
+        }
       });
   };
 
   render() {
-    const { showModal, isLoading, largeImg, images, error, query } = this.state;
-    const showMoreCheck = images.length !== 0 && !isLoading;
+    const { showModal, isLoading, largeImg, images, error, query, showMore } =
+      this.state;
+    const showMoreCheck = images.length !== 0 && !isLoading && showMore;
 
     return (
       <div>
@@ -89,7 +96,7 @@ class App extends Component {
             />
           )}
         </div>
-        <ToastContainer autoClose={2000} />
+        <ToastContainer autoClose={2500} />
       </div>
     );
   }
